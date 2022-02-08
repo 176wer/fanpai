@@ -13,7 +13,7 @@
         recalc = function() {
             var clientWidth = docEl.clientWidth;
             var clientHeight = docEl.clientHeight;
-            //console.log(clientHeight);
+
             if (!clientWidth) return;
             docEl.style.fontSize = 55 * (clientHeight / 1080) + 'px';
         };
@@ -24,7 +24,17 @@
 </script>
 </head>
 <body>
-	
+
+<div id="myModal" class="modal">
+
+    <!-- 关闭按钮 -->
+    <span class="close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+
+    <!-- 弹窗内容 -->
+    <img class="modal-content" id="img01">
+
+
+</div>
 	<div class="lottery-con" id="lottery">
        
         <div class="lottery-body clearfix">
@@ -59,7 +69,7 @@
             </div><!--lottery-tool-->
         </div><!--lottery-body 内容部分-->
 
-        <div class="lottery-msg">{{ lotteryMsg }}</div>
+
     </div><!--lottery-->	
 
 <script src="js/zepto.min.js"></script>
@@ -78,21 +88,21 @@
             defaultPrizeList : [
                 //加息卷0.5% 2小时
                 {
-                    class : 'lottery-card-volume lottery-cv1',
+                    class : 'sport',
                     title : '运动接力赛' ,
                     text :'',
                     describe : '运动接力赛'
                 },
 				  //巨人的脚步
                 {
-                    class : 'bigpeople lottery-cv1',
+                    class : 'bigpeople',
                     title : '巨人的脚步' ,
                     text :'',
                     describe : '巨人的脚步'
                 },
                 //一圈到底
                 {
-                    class : 'yiquan lottery-cv1',
+                    class : 'yiquan',
                     title : '一圈到底' ,
                     text : '',
                     describe : '一圈到底'
@@ -107,7 +117,7 @@
                 },
                 //body
                 {
-                    class : 'body lottery-cv1',
+                    class : 'body',
                     title : '身体不听话' ,
                     text : '',
                     describe : '身体不听话'
@@ -238,10 +248,25 @@
                 $('.lottery-tb-list').on('click','.viewport-flip',function(){
 				   
                     var _that = $(this);
+
+                    var modal = document.getElementById('myModal');
+                    var modalImg = document.getElementById("img01");
+                    // 获取 <span> 元素，设置关闭按钮
+                    var span = document.getElementsByClassName("close")[0];
+                    modal.style.display = "block";
+                    console.log("./images/"+_self.defaultPrizeList[_that.attr('data-index')].class+".png")
+                    modalImg.src = "./images/"+_self.defaultPrizeList[_that.attr('data-index')].class+".png";
+
+                    // 当点击 (x), 关闭弹窗
+                    span.onclick = function() {
+                    modal.style.display = "none";
+                }
+
                     //如果已经翻牌那么就不予许再次翻转
                    // if ( _that.find('.lottery-positive').hasClass('out') && !$('.lottery-reverse').hasClass('out') ) {
 					
                         _self.clickIndex = _that.attr('data-index')
+
                         //按钮状态
                         _self.flopBtnText = _self.flopNum >= 0 ? '返回' : '结束';
 
@@ -267,13 +292,7 @@
                             _that.find('.lottery-positive').addClass('in').removeClass('out');
                             _self.flopNum -= 1; //减少一次抽奖 机会
 
-                            //弹出获奖结果提示框
-                            var timer2 = setTimeout(function(){
-                                alert( _self.defaultPrizeList[_self.clickIndex].title )
-                                clearTimeout(timer2)
-                            },500)
 
-                            clearTimeout(timer1)
                         }, 225);
                    // }
                 })
