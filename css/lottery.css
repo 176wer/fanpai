@@ -117,7 +117,8 @@ div{
 .lottery-tbody {
   background-color: #f95f53;
   padding: 0.375rem;
-  width: 16.75rem;
+  width: 98%;
+
   margin: 0 auto;
   border-radius: 3px;
 }
@@ -179,8 +180,8 @@ div{
   height: 19.375rem;
 }
 .lottery-tb-list li {
-  width: 5.475rem;
-  height: 6.325rem;
+  width: 17.475rem;
+  height: 9.325rem;
   border-radius: 3px;
   position: absolute;
   overflow: hidden;
@@ -192,32 +193,32 @@ div{
 .lottery-tb-list li:nth-child(1) {
   -webkit-transition-delay: 100ms;
   left: 0;
-  top: 0;
+  top: 0.5rem;
 }
 .lottery-tb-list li:nth-child(2) {
   -webkit-transition-delay: 200ms;
-  left: 5.65rem;
-  top: 0;
+  left: 12.975rem;
+  top: 0.5rem;
 }
 .lottery-tb-list li:nth-child(3) {
   -webkit-transition-delay: 300ms;
-  left: 11.275rem;
-  top: 0;
+  left: 25.975rem;
+ top: 0.5rem;
 }
 .lottery-tb-list li:nth-child(4) {
   -webkit-transition-delay: 400ms;
   left: 0rem;
-  top: 6.5rem;
+  top: 10.325rem;
 }
 .lottery-tb-list li:nth-child(5) {
   -webkit-transition-delay: 500ms;
-  left: 11.275rem;
-  top: 6.5rem;
+  left: 12.975rem;
+top: 10.325rem;
 }
 .lottery-tb-list li:nth-child(6) {
   -webkit-transition-delay: 600ms;
-  left: 5.64rem;
-  top: 6.5rem;
+  left: 25.975rem;
+ top: 10.325rem;
 }
 .lottery-tb-list li:nth-child(7) {
   -webkit-transition-delay: 700ms;
@@ -230,13 +231,13 @@ div{
   top: 6.5rem;
 }
 .lottery-tb-list .lottery-playing-cards {
-  width: 100%;
-  height: 100%;
+  width: 98%;
+  height: 98%;
 }
 .lottery-tb-list .lottery-flip-card {
   position: absolute;
-  width: 5.475rem;
-  height: 6.325rem;
+   width: 12.675rem;
+   height: 9.325rem;
   left: 0;
   top: 0;
   border-radius: 3px;
@@ -257,8 +258,8 @@ div{
 .lottery-tb-list .lottery-positive i.sport {
   background: url(../images/sport.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+ width: 11.475rem;
+   height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -266,8 +267,8 @@ div{
 .lottery-tb-list .lottery-positive i.bigpeople {
   background: url(../images/bigpeople.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+width: 11.475rem;
+   height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -275,8 +276,8 @@ div{
 .lottery-tb-list .lottery-positive i.yiquan {
   background: url(../images/yiquan.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+width: 11.475rem;
+height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -285,8 +286,8 @@ div{
 .lottery-tb-list .lottery-positive i.bahe {
   background: url(../images/bahe.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+ width: 11.475rem;
+  height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -295,8 +296,8 @@ div{
 .lottery-tb-list .lottery-positive i.body {
   background: url(../images/body.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+width: 11.475rem;
+   height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -305,8 +306,8 @@ div{
 .lottery-tb-list .lottery-positive i.mutou {
   background: url(../images/mutou.png) center no-repeat;
   background-size: 100%;
-  width: 4.375rem;
-  height: 6.375rem;
+  width: 11.475rem;
+height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -491,10 +492,11 @@ div{
 
 /* 图片 */
 .modal-content {
+ top: -100px;
     margin: auto;
     display: block;
     width: 80%;
-    max-width: 700px;
+
 }
 
 /* 文本内容 */

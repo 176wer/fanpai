@@ -59,8 +59,7 @@
                             </li>
                         </ul>
                         
-                        <!-- 翻牌按钮 -->
-                        <div class="lottery-tb-btn" id="flopBtn">{{ flopBtnText }}</div>
+                       
 
                         <!--透明遮罩层用于遮挡操作-->
                         <div class="lottery-mask" :style="{ 'display' : flopDisable.mask }"></div>
@@ -149,6 +148,62 @@
         methods : {
             initEvent (){
                 var _self = this;
+				
+				
+				
+				
+				//纸牌反面效果
+                var filpReverse = function(callback){
+                    $('.lottery-positive').addClass('out').removeClass('in');
+                    var timer1 = setTimeout(function() {
+                        $('.lottery-reverse').addClass('in').removeClass('out');
+                        var timer2 = setTimeout(function(){
+                            callback && callback()
+                            clearTimeout(timer2)
+                        },200)
+                        clearTimeout(timer1)
+                    }, 225);
+                }
+				
+				
+				  //如果已经抽奖翻了一张牌 并且 还有机会那么就可以进行再次洗牌翻牌操作
+					_self.defaultPrizeList.sort(function(){return Math.random()-0.5;})
+                    if ( $('.lottery-reverse').hasClass('out') && _self.flopNum > 0 && _self.flopBtnText == '翻牌' ) {
+
+                        filpReverse(function(){
+                            //翻转洗牌效果
+                            _self.flopDisable = {
+                                shuffle : 'shuffle', 
+                                mask : 'block'
+                            } 
+                            //添加洗牌效果
+                            var timer1 = setTimeout(function(){
+                                _self.flopBtnText = '返回'; //按钮状态改变 
+                                _self.flopDisable.shuffle = ''; //回牌
+                                //等牌重新回到自己的位置才能让用户进行操作
+                                var timer2 = setTimeout(function(){
+                                    _self.flopDisable.mask = ''; //去掉遮罩层
+                                    clearTimeout(timer2)
+                                },650);
+                                clearTimeout(timer1)
+                            },1100);
+                        });
+
+                    }else 
+                    if( $('.lottery-reverse').hasClass('out') && _self.flopBtnText == '返回' ){
+                        //重新显示默认奖品，并翻转
+                        var defaultArr = objDeepCopy( exchangeArrayObjects( _self.defaultPrizeList , _self.defaultPrizeList , _self.clickIndex , 'title' ) ) ;
+                        for( var i in defaultArr ){
+                            Vue.set(_self.defaultPrizeList[i],'class',defaultArr[i].class)
+                            Vue.set(_self.defaultPrizeList[i],'title',defaultArr[i].title)
+                            Vue.set(_self.defaultPrizeList[i],'text',defaultArr[i].text)
+                            Vue.set(_self.defaultPrizeList[i],'describe',defaultArr[i].describe)
+                        }
+                        _self.flopBtnText = '翻牌';
+                        filpPositive();
+                    }else{
+                        alert( _self.flopNum || !$('.lottery-reverse').hasClass('out') ? '您还没有进行翻牌哦!' : '您没有更多的抽奖机会了，快去赚取吧' );
+                    }
 
                 //翻牌按钮，按下抬起效果
                 $('#flopBtn').on('touchstart',function(){
@@ -222,26 +277,9 @@
                 _self.defaultPrizeList = objDeepCopy( _self.defaultPrizeList )
 				
 
-                //纸牌正面效果
-                var filpPositive = function(){
-                    $('.lottery-reverse').addClass('out').removeClass('in');
-                    setTimeout(function() {
-                        $('.lottery-positive').addClass('in').removeClass('out');
-                    }, 225);
-                }
+             
 
-                //纸牌反面效果
-                var filpReverse = function(callback){
-                    $('.lottery-positive').addClass('out').removeClass('in');
-                    var timer1 = setTimeout(function() {
-                        $('.lottery-reverse').addClass('in').removeClass('out');
-                        var timer2 = setTimeout(function(){
-                            callback && callback()
-                            clearTimeout(timer2)
-                        },200)
-                        clearTimeout(timer1)
-                    }, 225);
-                }
+                
 
 
                 //点击单个纸牌的触发的事件
@@ -298,46 +336,7 @@
                 })
 
                 //点击翻牌按钮触发的事件
-                $('#flopBtn').bind('click', function() {
-                    //如果已经抽奖翻了一张牌 并且 还有机会那么就可以进行再次洗牌翻牌操作
-					_self.defaultPrizeList.sort(function(){return Math.random()-0.5;})
-                    if ( $('.lottery-reverse').hasClass('out') && _self.flopNum > 0 && _self.flopBtnText == '翻牌' ) {
-
-                        filpReverse(function(){
-                            //翻转洗牌效果
-                            _self.flopDisable = {
-                                shuffle : 'shuffle', 
-                                mask : 'block'
-                            } 
-                            //添加洗牌效果
-                            var timer1 = setTimeout(function(){
-                                _self.flopBtnText = '返回'; //按钮状态改变 
-                                _self.flopDisable.shuffle = ''; //回牌
-                                //等牌重新回到自己的位置才能让用户进行操作
-                                var timer2 = setTimeout(function(){
-                                    _self.flopDisable.mask = ''; //去掉遮罩层
-                                    clearTimeout(timer2)
-                                },650);
-                                clearTimeout(timer1)
-                            },1100);
-                        });
-
-                    }else 
-                    if( $('.lottery-reverse').hasClass('out') && _self.flopBtnText == '返回' ){
-                        //重新显示默认奖品，并翻转
-                        var defaultArr = objDeepCopy( exchangeArrayObjects( _self.defaultPrizeList , _self.defaultPrizeList , _self.clickIndex , 'title' ) ) ;
-                        for( var i in defaultArr ){
-                            Vue.set(_self.defaultPrizeList[i],'class',defaultArr[i].class)
-                            Vue.set(_self.defaultPrizeList[i],'title',defaultArr[i].title)
-                            Vue.set(_self.defaultPrizeList[i],'text',defaultArr[i].text)
-                            Vue.set(_self.defaultPrizeList[i],'describe',defaultArr[i].describe)
-                        }
-                        _self.flopBtnText = '翻牌';
-                        filpPositive();
-                    }else{
-                        alert( _self.flopNum || !$('.lottery-reverse').hasClass('out') ? '您还没有进行翻牌哦!' : '您没有更多的抽奖机会了，快去赚取吧' );
-                    }
-                });
+              
 
 
 
