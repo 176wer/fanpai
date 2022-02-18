@@ -114,6 +114,12 @@ div{
   border-top-left-radius: 3px;
   margin: 0 auto -0.025rem;
 }
+
+body {
+	overflow:scroll;
+	overflow-y:hidden;
+	overflow-x:hidden;
+}
 .lottery-tbody {
   background-color: #f95f53;
   padding: 0.375rem;
@@ -197,12 +203,12 @@ div{
 }
 .lottery-tb-list li:nth-child(2) {
   -webkit-transition-delay: 200ms;
-  left: 12.975rem;
+  left: 11.575rem;
   top: 0.5rem;
 }
 .lottery-tb-list li:nth-child(3) {
   -webkit-transition-delay: 300ms;
-  left: 25.975rem;
+  left: 22.975rem;
  top: 0.5rem;
 }
 .lottery-tb-list li:nth-child(4) {
@@ -212,12 +218,12 @@ div{
 }
 .lottery-tb-list li:nth-child(5) {
   -webkit-transition-delay: 500ms;
-  left: 12.975rem;
+   left: 11.575rem;
 top: 10.325rem;
 }
 .lottery-tb-list li:nth-child(6) {
   -webkit-transition-delay: 600ms;
-  left: 25.975rem;
+  left: 22.975rem;
  top: 10.325rem;
 }
 .lottery-tb-list li:nth-child(7) {
@@ -236,7 +242,7 @@ top: 10.325rem;
 }
 .lottery-tb-list .lottery-flip-card {
   position: absolute;
-   width: 12.675rem;
+   width: 11.0rem;
    height: 9.325rem;
   left: 0;
   top: 0;
@@ -258,7 +264,7 @@ top: 10.325rem;
 .lottery-tb-list .lottery-positive i.sport {
   background: url(../images/sport.png) center no-repeat;
   background-size: 100%;
- width: 11.475rem;
+ width: 11.0rem;
    height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
@@ -267,7 +273,7 @@ top: 10.325rem;
 .lottery-tb-list .lottery-positive i.bigpeople {
   background: url(../images/bigpeople.png) center no-repeat;
   background-size: 100%;
-width: 11.475rem;
+width: 11.0rem;
    height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
@@ -276,8 +282,7 @@ width: 11.475rem;
 .lottery-tb-list .lottery-positive i.yiquan {
   background: url(../images/yiquan.png) center no-repeat;
   background-size: 100%;
-width: 11.475rem;
-height: 10.325rem;
+width: 11.0rem;height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -286,8 +291,7 @@ height: 10.325rem;
 .lottery-tb-list .lottery-positive i.bahe {
   background: url(../images/bahe.png) center no-repeat;
   background-size: 100%;
- width: 11.475rem;
-  height: 10.325rem;
+width: 11.0rem;  height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -296,8 +300,7 @@ height: 10.325rem;
 .lottery-tb-list .lottery-positive i.body {
   background: url(../images/body.png) center no-repeat;
   background-size: 100%;
-width: 11.475rem;
-   height: 10.325rem;
+width: 11.0rem;   height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
@@ -306,8 +309,7 @@ width: 11.475rem;
 .lottery-tb-list .lottery-positive i.mutou {
   background: url(../images/mutou.png) center no-repeat;
   background-size: 100%;
-  width: 11.475rem;
-height: 10.325rem;
+width: 11.0rem;height: 10.325rem;
   line-height: 4.375rem;
   color: #fff;
   text-align: right;
