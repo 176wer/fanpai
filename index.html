@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"> 
-	<title>翻牌抽奖游戏</title>
-	<link rel="stylesheet" type="text/css" href="css/lottery.css">
-<script>
-//这里以750px的设计稿进行rem计算，基数是40px，那么假如100px/40px=2.5rem
-(function (doc, win) {
-	  var docEl = doc.documentElement,
-        resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
-        recalc = function() {
-            var clientWidth = docEl.clientWidth;
-            var clientHeight = docEl.clientHeight;
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <title>翻牌抽奖游戏</title>
+    <link rel="stylesheet" type="text/css" href="css/lottery.css">
 
-            if (!clientWidth) return;
-            docEl.style.fontSize = 55 * (clientHeight / 1080) + 'px';
-        };
-    if (!doc.addEventListener) return;
-    win.addEventListener(resizeEvt, recalc, false);
-    doc.addEventListener('DOMContentLoaded', recalc, false);
-})(document, window);
-</script>
+    <script>
+        //这里以750px的设计稿进行rem计算，基数是40px，那么假如100px/40px=2.5rem
+        (function (doc, win) {
+            var docEl = doc.documentElement,
+                resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                recalc = function () {
+                    var clientWidth = docEl.clientWidth;
+                    var clientHeight = docEl.clientHeight;
+
+                    if (!clientWidth) return;
+                    docEl.style.fontSize = 55 * (clientHeight / 1080) + 'px';
+                };
+            if (!doc.addEventListener) return;
+            win.addEventListener(resizeEvt, recalc, false);
+            doc.addEventListener('DOMContentLoaded', recalc, false);
+        })(document, window);
+    </script>
 </head>
 <body>
 
@@ -35,41 +36,59 @@
 
 
 </div>
-	<div class="lottery-con" id="lottery">
-       
-        <div class="lottery-body clearfix">
-            <div class="lottery-tool">
-                
-                <div class="lottery-tbody">
-                    <div class="lottery-tb-inner" :class="flopDisable.shuffle">
-                        
-                        <!-- 纸牌列表 -->
-                        <ul class="lottery-tb-list">
-                            <li v-for="(el,index) in defaultPrizeList">
-                                <!-- 纸牌操作 -->
-                                <div class="lottery-playing-cards viewport-flip" :data-index="index">
+<div class="lottery-con" id="lottery">
 
-                                    <div class="lottery-flip-card lottery-positive flip">
-                                        <i :class="el.class" v-html="el.text"></i>
-                                       
-                                    </div>
-                                    <div class="lottery-flip-card lottery-reverse flip out"></div>
+    <div class="lottery-body clearfix">
+        <div class="lottery-tool">
+
+            <div class="lottery-tbody">
+                <div class="lottery-tb-inner" :class="flopDisable.shuffle">
+
+                    <!-- 纸牌列表 -->
+                    <ul class="lottery-tb-list">
+                        <li v-for="(el,index) in defaultPrizeList">
+                            <!-- 纸牌操作 -->
+                            <div class="lottery-playing-cards viewport-flip" :data-index="index">
+
+                                <div class="lottery-flip-card lottery-positive flip">
+                                    <i :class="el.class" v-html="el.text"></i>
 
                                 </div>
-                            </li>
-                        </ul>
-                        
-                       
+                                <div class="lottery-flip-card lottery-reverse flip out"></div>
 
-                        <!--透明遮罩层用于遮挡操作-->
-                        <div class="lottery-mask" :style="{ 'display' : flopDisable.mask }"></div>
+                            </div>
+                        </li>
+                    </ul>
+                    <button class="fanpai" style="position: absolute;bottom: 10px;left: 50%" type="primary">重新 洗牌
+                    </button>
+<!--                    <button class="resetjiang" style="position: absolute;bottom: 10px;left: -webkit-calc(50% + 100px)"-->
+<!--                            type="primary">重置抽奖-->
+<!--                    </button>-->
+                    <!--透明遮罩层用于遮挡操作-->
+
+                    <div class="lottery-mask" :style="{ 'display' : flopDisable.mask }"></div>
+                    <div id="w-error-popup-white" style="display: none;"
+                         class="w-error-popup-white">
+                        <div class="w-error-back"></div>
+                        <div class="w-error-inner">
+                            <div id="w-confirm-content" class="w-error-content" style="height: auto; font-size: 26px;">
+                                取消后不能恢复，确定取消么？
+                            </div>
+                            <div class="btn" style="padding: 1rem; text-align: right;">
+                                <a class="u-btn u-btn-red"
+                                   href="javascript:canclePopup();">取消</a> <a id="sure"
+                                                                                class="u-btn">确定</a>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
-            </div><!--lottery-tool-->
-        </div><!--lottery-body 内容部分-->
+            </div>
+        </div><!--lottery-tool-->
+    </div><!--lottery-body 内容部分-->
 
 
-    </div><!--lottery-->	
+</div><!--lottery-->
 
 <script src="js/zepto.min.js"></script>
 <script src="js/vue.min.2.x.js"></script>
@@ -78,151 +97,716 @@
      * 如果是 Vue 1.x 版本只要修改
      * html 中的 (el,index) 改成 el
      * index 改成 $index
-    */ 
-	var vm = new Vue({
-        el:'#lottery',
-		data:{
-            lotteryMsg:'', //信息提示
+     */
+    var vm = new Vue({
+        el: '#lottery',
+        data: {
+            lotteryMsg: '', //信息提示
             //默认奖品列表
-            defaultPrizeList : [
+            defaultPrizeList: [],
+            defaultPrizeListraw: [
                 //加息卷0.5% 2小时
                 {
-                    class : 'sport',
-                    title : '运动接力赛' ,
-                    text :'',
-                    describe : '运动接力赛'
+                    class: 'jianpan',
+                    title: '键鼠套装1',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
                 },
-				  //巨人的脚步
+
                 {
-                    class : 'bigpeople',
-                    title : '巨人的脚步' ,
-                    text :'',
-                    describe : '巨人的脚步'
+                    class: 'tuzi',
+                    title: '周大福 转运珠1',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
                 },
                 //一圈到底
                 {
-                    class : 'yiquan',
-                    title : '一圈到底' ,
-                    text : '',
-                    describe : '一圈到底'
+                    class: 'hema',
+                    title: '河马 美食基金1',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
                 },
-              
+
                 //拔河
                 {
-                    class : 'bahe',
-                    title : '拔河比赛' ,
-                    text : '',
-                    describe : '拔河比赛'
+                    class: 'louyingche',
+                    title: '露营车1',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
                 },
                 //body
                 {
-                    class : 'body',
-                    title : '身体不听话' ,
-                    text : '',
-                    describe : '身体不听话'
+                    class: 'chayingji',
+                    title: '茶饮机1',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
                 },
                 //mutou
                 {
-                    class : 'mutou',
-                    title : '123木头人' ,
-                    text : '',
-                    describe : '123木头人'
-                } 
-            ] ,
-            newPrizeList : [],//新的奖品数据
-            flopNum : 3 ,//剩余抽奖次数
-            flopDisable : {
-                shuffle : '', //洗牌
-                mask : '' //遮罩
-            } , //禁止操作纸牌及按钮开关
-            flopBtnText : '翻牌', //按钮状态
-            clickIndex : null //被点击的索引
-        },
-        created () {
-            var _self = this;
+                    class: 'gouwuka',
+                    title: '购物基金1',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                //拔河
+                {
+                    class: 'jimu',
+                    title: '乐高 积木玩具1',
+                    num: 1,
+                    text: '',
+                    describe: '乐高 积木玩具'
+                },
+                //body
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷1',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒1',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },//加息卷0.5% 2小时
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装2',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
 
-            Vue.nextTick(function(){
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠2',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                //一圈到底
+                {
+                    class: 'hema',
+                    title: '河马 美食基金2',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+
+                //拔河
+                {
+                    class: 'louyingche',
+                    title: '露营车2',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                //body
+                {
+                    class: 'chayingji',
+                    title: '茶饮机2',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
+                },
+                //mutou
+                {
+                    class: 'gouwuka',
+                    title: '购物基金2',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                //拔河
+                {
+                    class: 'jimu',
+                    title: '乐高 积木玩具2',
+                    num: 1,
+                    text: '',
+                    describe: '乐高 积木玩具'
+                },
+                //body
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷2',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒2',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },//加息卷0.5% 2小时
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装3',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠3',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                //一圈到底
+                {
+                    class: 'hema',
+                    title: '河马 美食基金3',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+
+                //拔河
+                {
+                    class: 'louyingche',
+                    title: '露营车3',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                //body
+                {
+                    class: 'chayingji',
+                    title: '茶饮机3',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
+                },
+                //mutou
+                {
+                    class: 'gouwuka',
+                    title: '购物基金3',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                //拔河
+                {
+                    class: 'jimu',
+                    title: '乐高 积木玩具3',
+                    num: 1,
+                    text: '',
+                    describe: '乐高 积木玩具'
+                },
+                //body
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷3',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒3',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },//加息卷0.5% 2小时
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装4',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠4',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                //一圈到底
+                {
+                    class: 'hema',
+                    title: '河马 美食基金4',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+
+                //拔河
+                {
+                    class: 'louyingche',
+                    title: '露营车4',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                //body
+                {
+                    class: 'chayingji',
+                    title: '茶饮机4',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
+                },
+                //mutou
+                {
+                    class: 'gouwuka',
+                    title: '购物基金4',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                //拔河
+                {
+                    class: 'jimu',
+                    title: '乐高 积木玩具4',
+                    num: 1,
+                    text: '',
+                    describe: '乐高 积木玩具'
+                },
+                //body
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷4',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒4',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },//加息卷0.5% 2小时
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装5',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠5',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                //一圈到底
+                {
+                    class: 'hema',
+                    title: '河马 美食基金5',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+
+                //拔河
+                {
+                    class: 'louyingche',
+                    title: '露营车5',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                //body
+                {
+                    class: 'chayingji',
+                    title: '茶饮机5',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
+                },
+                //mutou
+                {
+                    class: 'gouwuka',
+                    title: '购物基金5',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                //拔河
+                {
+                    class: 'jimu',
+                    title: '乐高 积木玩具5',
+                    num: 1,
+                    text: '',
+                    describe: '乐高 积木玩具'
+                },
+                //body
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷5',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒5',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },
+                //mutou
+                {
+                    class: 'gangbi',
+                    title: '钢笔礼盒6',
+                    num: 1,
+                    text: '',
+                    describe: '钢笔礼盒'
+                },
+                {
+                    class: 'chayingji',
+                    title: '茶饮机6',
+                    num: 1,
+                    text: '',
+                    describe: '茶饮机'
+                },
+                {
+                    class: 'louyingche',
+                    title: '露营车6',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                {
+                    class: 'louyingche',
+                    title: '露营车7',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷6',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装6',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠6',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金6',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金6',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                {
+                    class: 'louyingche',
+                    title: '露营车8',
+                    num: 1,
+                    text: '',
+                    describe: '露营车'
+                },
+                {
+                    class: 'zhangpeng',
+                    title: '露营帐篷7',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装7',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠7',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金7',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金7',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },{
+                    class: 'zhangpeng',
+                    title: '露营帐篷8',
+                    num: 1,
+                    text: '',
+                    describe: '露营帐篷'
+                },
+                {
+                    class: 'jianpan',
+                    title: '键鼠套装8',
+                    text: '',
+                    num: 1,
+                    describe: '键鼠套装'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠8',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金8',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金8',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠9',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金9',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金9',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠10',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金10',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金10',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                {
+                    class: 'tuzi',
+                    title: '周大福 转运珠11',
+                    text: '',
+                    num: 1,
+                    describe: '周大福 转运珠'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金11',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金11',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                },
+                {
+                    class: 'hema',
+                    title: '河马 美食基金12',
+                    num: 1,
+                    text: '',
+                    describe: '河马 美食基金'
+                },
+                {
+                    class: 'gouwuka',
+                    title: '购物基金12',
+                    num: 1,
+                    text: '',
+                    describe: '购物基金'
+                }
+            ],
+            newPrizeList: [],//新的奖品数据
+            flopNum: 76,//剩余抽奖次数
+            flopDisable: {
+                shuffle: '', //洗牌
+                mask: '' //遮罩
+            }, //禁止操作纸牌及按钮开关
+            flopBtnText: '翻牌', //按钮状态
+            clickIndex: null //被点击的索引
+        },
+        mounted(){
+            window.addEventListener("beforeunload", e => this.beforeunloadHandler(e));
+            window.addEventListener("unload", e => this.unloadHandler(e));
+        },
+        destroyed() {
+            window.onbeforeunload = null
+        },
+        beforeRouteUpdate(to, from, next) {
+            this.message = 'Page refreshed'
+            alert("test")
+            next()
+        },
+        created() {
+            var _self = this;
+            this.defaultPrizeList = myRandom(this.defaultPrizeListraw, 9)
+
+            Vue.nextTick(function () {
                 _self.initEvent()
             })
-        } ,
-        methods : {
-            initEvent (){
+        },
+        methods: {
+
+            beforeunloadHandler() {
+                this._beforeUnload_time = new Date().getTime();
+            },
+            unloadHandler(e) {
+                this._gap_time = new Date().getTime() - this._beforeUnload_time;
+
+                // 关闭或刷新窗口都保存数据到后台
+                this.saveToCloud();
+                // 判断窗口是关闭还是刷新
+                if (this._gap_time <= 5) {
+                    // TODO:
+                }
+            },
+            initEvent() {
                 var _self = this;
-				
-				
-				
-				
-				//纸牌反面效果
-                var filpReverse = function(callback){
+
+
+                //纸牌反面效果
+                var filpReverse = function (callback) {
                     $('.lottery-positive').addClass('out').removeClass('in');
-                    var timer1 = setTimeout(function() {
+                    var timer1 = setTimeout(function () {
                         $('.lottery-reverse').addClass('in').removeClass('out');
-                        var timer2 = setTimeout(function(){
+                        var timer2 = setTimeout(function () {
                             callback && callback()
                             clearTimeout(timer2)
-                        },200)
+                        }, 200)
                         clearTimeout(timer1)
                     }, 225);
                 }
-				
-				
-				  //如果已经抽奖翻了一张牌 并且 还有机会那么就可以进行再次洗牌翻牌操作
-					_self.defaultPrizeList.sort(function(){return Math.random()-0.5;})
-                    if ( $('.lottery-reverse').hasClass('out') && _self.flopNum > 0 && _self.flopBtnText == '翻牌' ) {
 
-                        filpReverse(function(){
-                            //翻转洗牌效果
-                            _self.flopDisable = {
-                                shuffle : 'shuffle', 
-                                mask : 'block'
-                            } 
-                            //添加洗牌效果
-                            var timer1 = setTimeout(function(){
-                                _self.flopBtnText = '返回'; //按钮状态改变 
-                                _self.flopDisable.shuffle = ''; //回牌
-                                //等牌重新回到自己的位置才能让用户进行操作
-                                var timer2 = setTimeout(function(){
-                                    _self.flopDisable.mask = ''; //去掉遮罩层
-                                    clearTimeout(timer2)
-                                },650);
-                                clearTimeout(timer1)
-                            },1100);
-                        });
 
-                    }else 
-                    if( $('.lottery-reverse').hasClass('out') && _self.flopBtnText == '返回' ){
-                        //重新显示默认奖品，并翻转
-                        var defaultArr = objDeepCopy( exchangeArrayObjects( _self.defaultPrizeList , _self.defaultPrizeList , _self.clickIndex , 'title' ) ) ;
-                        for( var i in defaultArr ){
-                            Vue.set(_self.defaultPrizeList[i],'class',defaultArr[i].class)
-                            Vue.set(_self.defaultPrizeList[i],'title',defaultArr[i].title)
-                            Vue.set(_self.defaultPrizeList[i],'text',defaultArr[i].text)
-                            Vue.set(_self.defaultPrizeList[i],'describe',defaultArr[i].describe)
+                //如果已经抽奖翻了一张牌 并且 还有机会那么就可以进行再次洗牌翻牌操作
+                if ($('.lottery-reverse').hasClass('out') && _self.flopNum > 0 && _self.flopBtnText == '翻牌') {
+
+
+                    _self.defaultPrizeList.sort(function () {
+                        return Math.random() - 0.5;
+                    })
+
+                    filpReverse(function () {
+                        //翻转洗牌效果
+                        _self.flopDisable = {
+                            shuffle: 'shuffle',
+                            mask: 'block'
                         }
-                        _self.flopBtnText = '翻牌';
-                        filpPositive();
-                    }else{
-                        alert( _self.flopNum || !$('.lottery-reverse').hasClass('out') ? '您还没有进行翻牌哦!' : '您没有更多的抽奖机会了，快去赚取吧' );
+                        //添加洗牌效果
+                        var timer1 = setTimeout(function () {
+                            _self.flopBtnText = '返回'; //按钮状态改变
+                            _self.flopDisable.shuffle = ''; //回牌
+                            //等牌重新回到自己的位置才能让用户进行操作
+                            var timer2 = setTimeout(function () {
+                                _self.flopDisable.mask = ''; //去掉遮罩层
+                                clearTimeout(timer2)
+                            }, 650);
+                            clearTimeout(timer1)
+                        }, 1100);
+                    });
+
+                } else if ($('.lottery-reverse').hasClass('out') && _self.flopBtnText == '返回') {
+                    //重新显示默认奖品，并翻转
+                    var defaultArr = objDeepCopy(exchangeArrayObjects(_self.defaultPrizeList, _self.defaultPrizeList, _self.clickIndex, 'title'));
+                    for (var i in defaultArr) {
+                        Vue.set(_self.defaultPrizeList[i], 'class', defaultArr[i].class)
+                        Vue.set(_self.defaultPrizeList[i], 'title', defaultArr[i].title)
+                        Vue.set(_self.defaultPrizeList[i], 'text', defaultArr[i].text)
+                        Vue.set(_self.defaultPrizeList[i], 'describe', defaultArr[i].describe)
+                        Vue.set(_self.defaultPrizeList[i], 'sum', defaultArr[i].sum)
                     }
+                    _self.flopBtnText = '翻牌';
+                    filpPositive();
+                } else {
+                    alert(_self.flopNum || !$('.lottery-reverse').hasClass('out') ? '您还没有进行翻牌哦!' : '您没有更多的抽奖机会了，快去赚取吧');
+                }
 
                 //翻牌按钮，按下抬起效果
-                $('#flopBtn').on('touchstart',function(){
+                $('#flopBtn').on('touchstart', function () {
                     $(this).addClass('lottery-tb-btn-d')
-                }).on('touchend',function(){
+                }).on('touchend', function () {
                     $(this).removeClass('lottery-tb-btn-d')
                 })
 
                 //让不支持CSS3 animation的浏览器向下兼容效果
-                var BROWSER = function() {
+                var BROWSER = function () {
                     var ua = navigator.userAgent.toLowerCase();
 
-                    var match = /(webkit)[ \/]([\w.]+)/.exec( ua ) ||
-                        /(opera)(?:.*version)?[ \/]([\w.]+)/.exec( ua ) ||
-                        /(msie) ([\w.]+)/.exec( ua ) ||
-                        !/compatible/.test( ua ) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec( ua ) ||
+                    var match = /(webkit)[ \/]([\w.]+)/.exec(ua) ||
+                        /(opera)(?:.*version)?[ \/]([\w.]+)/.exec(ua) ||
+                        /(msie) ([\w.]+)/.exec(ua) ||
+                        !/compatible/.test(ua) && /(mozilla)(?:.*? rv:([\w.]+))?/.exec(ua) ||
                         [];
 
-                    return { browser: match[1] || "", version: match[2] || "0" };
+                    return {browser: match[1] || "", version: match[2] || "0"};
                 }();
 
                 if ((BROWSER.animate = (BROWSER.browser !== "mozilla" && BROWSER.browser !== "webkit"))) {
@@ -233,7 +817,7 @@
                         oStyle.styleSheet.cssText = cssText;
                     } else {
                         oStyle.innerHTML = cssText;
-                    }   
+                    }
                     document.getElementsByTagName("head")[0].appendChild(oStyle);
                 }
 
@@ -251,98 +835,312 @@
                 }
 
                 /**
-                * @调换数组对象位置
-                * @param defaultArr 默认原始数据
-                * @param clickArr 被点击的数据
-                * @param clickIndex 被点击的索引值
-                * @param field 根据指定字段名来查询
-                * 已知被点击的索引，求被点击的数组元素在默认数组的哪个位置，并进行调换，返回新的调换过位置的默认原始数据数组
-                */
-                var exchangeArrayObjects = function(defaultArr,clickArr,clickIndex,field){
+                 * @调换数组对象位置
+                 * @param defaultArr 默认原始数据
+                 * @param clickArr 被点击的数据
+                 * @param clickIndex 被点击的索引值
+                 * @param field 根据指定字段名来查询
+                 * 已知被点击的索引，求被点击的数组元素在默认数组的哪个位置，并进行调换，返回新的调换过位置的默认原始数据数组
+                 */
+                var exchangeArrayObjects = function (defaultArr, clickArr, clickIndex, field) {
                     //打乱数组增加真实性
-                    var randomsort = function(a,b){return Math.random()>.5 ? -1 : 1;}
+                    var randomsort = function (a, b) {
+                        return Math.random() > .5 ? -1 : 1;
+                    }
                     defaultArr.sort(randomsort)
                     //进行数据调换
                     var defaultIndex = null; //未知默认的数组所在文本的值
-                    for( var i in defaultArr ){
-                        if ( defaultArr[i][field] == clickArr[clickIndex][field] ) {
+                    for (var i in defaultArr) {
+                        if (defaultArr[i][field] == clickArr[clickIndex][field]) {
                             defaultIndex = i;
                         }
                     }
-                    defaultArr[clickIndex] = defaultArr.splice(defaultIndex,1,defaultArr[clickIndex])[0]
+                    defaultArr[clickIndex] = defaultArr.splice(defaultIndex, 1, defaultArr[clickIndex])[0]
                     return defaultArr
                 }
 
+                $('#sure').on('click', function () {
+                    alert("test")
+                })
+                $('.fanpai').on('click', function () {
+                    if (_self.flopNum === 0) {
+                        alert("所有活动礼品，已被抽取完毕,你已无法继续翻牌")
+                        return;
+                    }
+                    _self.defaultPrizeList = myRandom(_self.defaultPrizeListraw, 9)
+                    filpReverse(function () {
+                        //翻转洗牌效果
+                        _self.flopDisable = {
+                            shuffle: 'shuffle',
+                            mask: 'block'
+                        }
+                        //添加洗牌效果
+                        var timer1 = setTimeout(function () {
+
+                            _self.flopDisable.shuffle = ''; //回牌
+                            //等牌重新回到自己的位置才能让用户进行操作
+                            var timer2 = setTimeout(function () {
+                                _self.flopDisable.mask = ''; //去掉遮罩层
+                                clearTimeout(timer2)
+                            }, 650);
+                            clearTimeout(timer1)
+                        }, 1100);
+                    });
+                })
+
+                $('.resetjiang').on('click', function () {
+                    $("#w-confirm-content").html("重置抽奖，取消还是确认呢？");
+                    $("#w-error-popup-white").show();
+                })
+
+
                 //刚开始使用默认礼品，返回的时候也是呈现默认礼品
-                _self.defaultPrizeList = objDeepCopy( _self.defaultPrizeList )
-				
-
-             
-
-                
+                _self.defaultPrizeList = objDeepCopy(_self.defaultPrizeList)
 
 
                 //点击单个纸牌的触发的事件
-                $('.lottery-tb-list').on('click','.viewport-flip',function(){
-				   
+                $('.lottery-tb-list').on('click', '.viewport-flip', function () {
+
+                    if (_self.flopNum === 0) {
+                        alert("所有活动礼品，已被抽取完毕")
+                        return;
+                    }
+
                     var _that = $(this);
+
+
+                    // if (_that.find('.lottery-positive').hasClass('in') && _that.find('.lottery-reverse').hasClass('out')) {
+                    //
+                    //     //如果已经抽奖翻了一张牌 并且 还有机会那么就可以进行再次洗牌翻牌操作
+                    //     if ($('.lottery-reverse').hasClass('out') && _self.flopNum > 0) {
+                    //         _self.defaultPrizeList = myRandom(_self.defaultPrizeListraw, 9)
+                    //         filpReverse(function () {
+                    //             //翻转洗牌效果
+                    //             _self.flopDisable = {
+                    //                 shuffle: 'shuffle',
+                    //                 mask: 'block'
+                    //             }
+                    //             //添加洗牌效果
+                    //             var timer1 = setTimeout(function () {
+                    //                 _self.flopBtnText = '返回'; //按钮状态改变
+                    //                 _self.flopDisable.shuffle = ''; //回牌
+                    //                 //等牌重新回到自己的位置才能让用户进行操作
+                    //                 var timer2 = setTimeout(function () {
+                    //                     _self.flopDisable.mask = ''; //去掉遮罩层
+                    //                     clearTimeout(timer2)
+                    //                 }, 650);
+                    //                 clearTimeout(timer1)
+                    //             }, 1100);
+                    //         });
+                    //
+                    //     }
+                    //
+                    //     return
+                    // }
+
 
                     var modal = document.getElementById('myModal');
                     var modalImg = document.getElementById("img01");
                     // 获取 <span> 元素，设置关闭按钮
                     var span = document.getElementsByClassName("close")[0];
                     modal.style.display = "block";
-                    console.log("./images/"+_self.defaultPrizeList[_that.attr('data-index')].class+".png")
-                    modalImg.src = "./images/"+_self.defaultPrizeList[_that.attr('data-index')].class+".png";
+                    modalImg.src = "./images/" + _self.defaultPrizeList[_that.attr('data-index')].class + ".png";
 
                     // 当点击 (x), 关闭弹窗
-                    span.onclick = function() {
-                    modal.style.display = "none";
-                }
+                    span.onclick = function () {
+                        modal.style.display = "none";
+                    }
 
+
+
+
+                    _self.clickIndex = _that.attr('data-index')
+
+                    //按钮状态
+                    _self.flopBtnText = _self.flopNum >= 0 ? '返回' : '结束';
+
+                    //这里需要调用接口数据，来进行数据更改，只要后端一条结果就可以
+                    //do code... 这里是模拟数据
+                    var obj = {
+                        class: 'lottery-thank-you',
+                        title: '谢谢参与',
+                        text: '',
+                        describe: ''
+                    };
+
+                    for (var i = 0, len = _self.defaultPrizeList.length; i < len; i++) {
+                        Vue.set(_self.defaultPrizeList[i], 'class', _self.defaultPrizeList[i].class)
+                        Vue.set(_self.defaultPrizeList[i], 'title', _self.defaultPrizeList[i].title)
+                        Vue.set(_self.defaultPrizeList[i], 'text', _self.defaultPrizeList[i].text)
+                        Vue.set(_self.defaultPrizeList[i], 'describe', _self.defaultPrizeList[i].describe)
+                        Vue.set(_self.defaultPrizeList[i], 'sum', _self.defaultPrizeList[i].sum)
+                    }
+
+                    //翻牌正面效果
+                    _that.find('.lottery-reverse').addClass('out').removeClass('in');
+                    var timer1 = setTimeout(function () {
+                        _that.find('.lottery-positive').addClass('in').removeClass('out');
+
+                    }, 225);
                     //如果已经翻牌那么就不予许再次翻转
-                   // if ( _that.find('.lottery-positive').hasClass('out') && !$('.lottery-reverse').hasClass('out') ) {
-					
-                        _self.clickIndex = _that.attr('data-index')
+                    if ( _that.find('.lottery-positive').hasClass('out') && !$('.lottery-reverse').hasClass('out') ) {
+                        _self.flopNum -= 1; //减少一次抽奖 机会
+                        _self.defaultPrizeList[_self.clickIndex].sum -= 1
+                    }
 
-                        //按钮状态
-                        _self.flopBtnText = _self.flopNum >= 0 ? '返回' : '结束';
-
-                        //这里需要调用接口数据，来进行数据更改，只要后端一条结果就可以
-                        //do code... 这里是模拟数据
-                        var obj = {
-                            class : 'lottery-thank-you',
-                            title : '谢谢参与' ,
-                            text : '',
-                            describe : ''
-                        };
-						
-                        for( var i = 0 , len = _self.defaultPrizeList.length ; i < len ; i++ ){
-                            Vue.set(_self.defaultPrizeList[i],'class',_self.defaultPrizeList[i].class)
-                            Vue.set(_self.defaultPrizeList[i],'title',_self.defaultPrizeList[i].title)
-                            Vue.set(_self.defaultPrizeList[i],'text',_self.defaultPrizeList[i].text)
-                            Vue.set(_self.defaultPrizeList[i],'describe',_self.defaultPrizeList[i].describe)
+                    console.log(_self.flopNum)
+                    for (var i = 0, len = _self.defaultPrizeListraw.length; i < len; i++) {
+                        if (_self.defaultPrizeListraw[i].title == _self.defaultPrizeList[_self.clickIndex].title) {
+                            _self.defaultPrizeListraw[i].num -= 1
                         }
-
-                        //翻牌正面效果
-                        _that.find('.lottery-reverse').addClass('out').removeClass('in');
-                        var timer1 = setTimeout(function() {
-                            _that.find('.lottery-positive').addClass('in').removeClass('out');
-                            _self.flopNum -= 1; //减少一次抽奖 机会
-
-
-                        }, 225);
-                   // }
+                    }
+                    // }
                 })
 
                 //点击翻牌按钮触发的事件
-              
-
 
 
             }
         }
-	})
+    })
+
+
+    function myRandom(arr, length) {
+        console.log(arr)
+
+        arr.sort(function () {
+            return Math.random() - 0.5;
+        })
+        let n = 1;
+        var newArr = []; // 组成的新数组初始化
+        for (let i = 0; i < arr.length; i++) {
+
+            if (arr[i].num > 0) {
+                n++;
+                newArr.push(arr[i])
+            }
+            if (n > length) {
+                break
+            }
+        }
+        console.log(newArr.reverse())
+        return newArr.reverse()
+    }
+
+    function fanpai(ref) {
+
+        if ($('.lottery-reverse').hasClass('out') && _self.flopNum > 0) {
+            ref.defaultPrizeList = myRandom(ref.defaultPrizeListraw, 9)
+            filpReverse(function () {
+                //翻转洗牌效果
+                ref.flopDisable = {
+                    shuffle: 'shuffle',
+                    mask: 'block'
+                }
+                //添加洗牌效果
+                var timer1 = setTimeout(function () {
+
+                    ref.flopDisable.shuffle = ''; //回牌
+                    //等牌重新回到自己的位置才能让用户进行操作
+                    var timer2 = setTimeout(function () {
+                        ref.flopDisable.mask = ''; //去掉遮罩层
+                        clearTimeout(timer2)
+                    }, 650);
+                    clearTimeout(timer1)
+                }, 1100);
+            });
+
+        }
+    }
+
+    function canclePopup() {
+        $("#w-error-popup-white").hide();
+    }
+
 </script>
+<style>/*w-error-popup-white*/
+.w-error-popup-white {
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+
+.w-error-popup-white .w-error-back {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .8);
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+}
+
+.w-error-popup-white .w-error-inner {
+    background-color: #fff;
+    width: 90%;
+    top: 15%;
+    left: 50%;
+    margin-left: -45%;
+    text-align: center;
+    border-radius: 20px;
+    padding: 0;
+    z-index: 1001;
+    position: relative;
+}
+
+.w-error-popup-white .w-error-inner h4 {
+    font-size: 20px;
+    color: #333;
+    padding: 16px 0;
+    margin: 0 32px;
+    border-bottom: 1px solid #e5e9ec;
+    font-weight: normal;
+}
+
+.w-error-popup-white .w-error-inner .w-error-content {
+    color: #333;
+    font-size: 16px;
+    line-height: 45px;
+    padding: 32px;
+    height: 270px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-align: left;
+}
+
+.w-close {
+    background: url(../images/result-error-x.png) no-repeat right 16px;
+    float: right;
+    right: 18px;
+    top: 0;
+    position: absolute;
+    z-index: 999;
+    width: 100px;
+    height: 85px;
+    cursor: pointer;
+    display: block;
+    background-size: 60%;
+}
+
+
+/*u-btn */
+.u-btn {
+    padding: 16px 80px;
+    background-color: #92c153;
+    border-bottom: 5px solid #7da646;
+    border-radius: 8px;
+    color: #fff;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.u-btn-red {
+    background-color: #ec7d69;
+    border-color: #e95c44;
+}
+</style>
 </body>
 </html>
